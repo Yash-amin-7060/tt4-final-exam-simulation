@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: task-manager-api
+    ports:
+      - "5000:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=Data Source=taskmanager.db
+    volumes:
+      - db-data:/app/data
+    networks:
+      - task-manager-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: task-manager-ui
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - task-manager-network
+
+networks:
+  task-manager-network:
+    driver: bridge
+
+volumes:
+  db-data:
